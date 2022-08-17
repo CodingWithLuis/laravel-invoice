@@ -44,7 +44,7 @@
                                     </ul>
                                 </td>
                                 <td>
-                                    <a href="#" class="btn btn-danger">Generar Factura</a>
+                                    <a href="{{ route('orders.generateInvoice', $order->id) }}" class="btn btn-danger">Generar Factura</a>
                                 </td>
                             </tr>
                             @endforeach

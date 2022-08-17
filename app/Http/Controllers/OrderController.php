@@ -8,6 +8,10 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
 
+use LaravelDaily\Invoices\Invoice;
+use LaravelDaily\Invoices\Classes\Buyer;
+use LaravelDaily\Invoices\Classes\InvoiceItem;
+
 class OrderController extends Controller
 {
     /**
@@ -59,6 +63,39 @@ class OrderController extends Controller
         }
 
         return redirect()->route('orders.index');
+    }
+
+    public function generateInvoice(Order $order)
+    {
+        $customer = new Buyer([
+            'name'          => $order->customer->name,
+            'custom_fields' => [
+                'email' => $order->customer->email,
+            ],
+        ]);
+
+        $seller = new Buyer([
+            'name'          => $order->user->name,
+            'custom_fields' => [
+                'email' => $order->user->email,
+            ],
+        ]);
+
+        foreach ($order->products as $product) {
+            $items[] = (new InvoiceItem())->title($product->name)
+                ->pricePerUnit($product->price)
+                ->quantity($product->pivot->quantity);
+        }
+
+        $invoice = Invoice::make()
+            ->buyer($customer)
+            ->seller($seller)
+            ->currencySymbol('$')
+            ->currencyCode('USD')
+            ->taxRate(15)
+            ->addItems($items);
+
+        return $invoice->download();
     }
 
     /**

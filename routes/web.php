@@ -22,4 +22,5 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+Route::get('orders/{order}/generateInvoice', [OrderController::class, 'generateInvoice'])->name('orders.generateInvoice');
 Route::resource('orders', OrderController::class);
